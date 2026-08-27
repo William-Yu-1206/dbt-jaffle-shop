@@ -1,0 +1,35 @@
+version: 2
+
+models:
+  - name: dim_customer
+    description: |
+      客戶維度表
+      粒度：一列 = 一位客戶
+      更新頻率：每日 06:00
+    columns:
+      - name: customer_id
+        description: "primary key"
+        tests:
+          - unique
+          - not_null
+      - name: LTV
+        description: "客戶所有已支付的總金額"  
+
+  - name: fct_orders
+    description: |
+      訂單事實表
+      Grain: 一列 = 一筆訂單
+    columns:
+      - name: order_id
+        description: "primary key"
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: "foreign key -> dim_customer"
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_customer')
+                field: customer_id

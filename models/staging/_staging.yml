@@ -1,0 +1,36 @@
+version: 2
+
+models:
+  - name: stg_customers
+    description: "客戶基本資料 one customer per row"
+    columns:
+      - name: customer_id
+        description: "primary key"
+        tests:
+          - unique
+          - not_null
+
+  - name: stg_orders
+    description: |
+      訂單基本資料 
+      Grain: one order per row"
+    columns:
+      - name: order_id
+        description: "primary key"
+        tests:
+          - unique
+          - not_null
+      - name: order_status
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['placed', 'shipped', 'completed', 'return_pending', 'returned']
+
+  - name: stg_payments
+    description: "金流基本資料，one payment per row"
+    columns:
+      - name: payment_id
+        description: "primary key"
+        tests:
+          - unique
+          - not_null
