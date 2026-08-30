@@ -15,6 +15,8 @@ payments_by_orders as (
 )
 
 select 
+  {{ dbt_utils.generate_surrogate_key(['o.order_id']) }}  as order_key,
+  {{ dbt_utils.generate_surrogate_key(['o.customer_id']) }}  as customer_key,
   o.order_id,
   o.customer_id,
   o.order_date,

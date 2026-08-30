@@ -32,14 +32,15 @@ customer_orders as (
 )
 
 
-select 
-  c.customer_id,
-  c.first_name,
-  c.last_name,
-  coalesce(o.total_orders, 0) as total_orders,
-  coalesce(o.total_amount, 0) as LTV,
-  o.first_order_date,
-  o.most_recent_order_date
+select
+    {{ dbt_utils.generate_surrogate_key(['c.customer_id']) }} as customer_key,
+    c.customer_id,
+    c.first_name,
+    c.last_name,
+    coalesce(o.total_orders, 0) as total_orders,
+    coalesce(o.total_amount, 0) as LTV,
+    o.first_order_date,
+    o.most_recent_order_date
 from customers c
 left join customer_orders o
   on c.customer_id = o.customer_id
