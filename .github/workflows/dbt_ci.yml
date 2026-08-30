@@ -1,0 +1,44 @@
+name: dbt CI    # 顯示在 Actions 頁面的名字
+
+on:             # 什麼時候跑
+  pull_request:
+    branch: [main]
+
+jobs:           # 跑什麼
+  dbt_build:    # job 的名字，自己取 (之後在 branch protection 的「Require status checks」裡要選它)
+    runs-on: ubuntu_latest
+
+    steps:      # 依序執行的步驟
+      - name: Checkout                      # 抓下這條 branch 的程式碼
+        uses: actions/checkout@v4
+
+      - name: Set up Python                 # 裝 Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      
+      - name: Install dbt                   # pip install
+        run: pip install dbt-core dbt-bigquery
+      
+      - name: Write Bigquery keyfile        # 從 Secret 還原金鑰檔
+        run: echo "${{ secrets.BIGQUERY_KEYFILE }}" | base64 -d > ./keyfile.json
+      
+      - name: Write profiles.yml            # 生出 profiles.yml
+        run: |
+          mkdir -p ~/.dbt
+          cat > ~/.dbt/profiles.yml << 'EOF'
+          jaffle_shop:
+            target: ci
+            outputs:
+              ci:
+                type: bigquery
+                method: service-account
+                project: dbt-learning-506203
+                dataset: dbt_ci_pr_${{ github.event.number }}
+                threads: 4
+                keyfile: ./keyfile.json
+                location: US
+          EOF
+
+      - name: dbt build                     # run
+        run: dbt build
