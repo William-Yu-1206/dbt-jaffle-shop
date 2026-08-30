@@ -7,8 +7,13 @@ models:
       粒度：一列 = 一位客戶
       更新頻率：每日 06:00
     columns:
+      - name: customer_key
+        description: "代理鍵"
+        tests:
+          - unique
+          - not_null
       - name: customer_id
-        description: "primary key"
+        description: "自然鍵"
         tests:
           - unique
           - not_null
@@ -20,16 +25,21 @@ models:
       訂單事實表
       Grain: 一列 = 一筆訂單
     columns:
-      - name: order_id
-        description: "primary key"
+      - name: order_key
+        description: "代理鍵"
         tests:
           - unique
           - not_null
-      - name: customer_id
-        description: "foreign key -> dim_customer"
+      - name: customer_key
+        description: "外鍵 -> dim_customer.customer_key"
         tests:
           - not_null
           - relationships:
               arguments:
                 to: ref('dim_customer')
-                field: customer_id
+                field: customer_key
+      - name: order_id
+        description: "自然鍵"
+        tests:
+          - unique
+          - not_null
