@@ -43,3 +43,23 @@ models:
         tests:
           - unique
           - not_null
+      - name: order_date
+        description: "外鍵 -> dim_date.date_key"
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_key
+
+  - name: dim_date
+    description: |
+      日期為度表
+      粒度：一列 = 一天
+    columns:
+      - name: date_key
+        description: "日期主鍵，date 型別"
+        tests:
+          - unique
+          - not_null
+  
